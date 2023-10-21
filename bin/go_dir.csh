@@ -1,7 +1,5 @@
 #!/bin/tcsh -fvx
 # Created by: alvaro. 2023-10-17 \
-echo $argv[0]
-echo $0
 
 set DOUSAGE = "Usage: go {help|list|create|delete|save|update|edit|remove_all} ?alias? ?path? ?regex?"
 
