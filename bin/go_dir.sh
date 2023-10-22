@@ -32,7 +32,45 @@ function usageHelp
 {
     printFunctionName
     setHelp
-    echo $DOUSAGE
+    echo "You will need to setup an alias that sources this script. As:"
+    echo "   > alias go 'source ~/bin/go_dir.sh'"
+    echo "=========================================================="
+    echo "$DOUSAGE"
+    echo "=========================================================="
+    echo "DESCRIPTION "
+    echo "   'go' is a tool that saves paths you want to go again. It has the option to save paths with their own aliases. When you save a new alias, it gets added to complete option: 'go <TAB>' and it will show the options.\n   It will look directly to you GOROOT path if you use a keyword that is not an alias or an option. It uses the first two strings as argument for regex searching for directories. "
+    echo "Directories are getting saved in: $PORTFOLIO_DIRS"
+    echo "If you want to redefine it, use a env var\n: > setenv PORTFOLIO_DIRS <new_path>"
+    echo "    "
+    echo "=========================================================="
+    echo "COMMANDS"
+
+    echo "   go list --> Display list of alias directories saved"
+
+    echo "   go create <alias_name> <alias_path> --> save a new alias"
+    echo "   go save   <alias_name> <alias_path> --> save a new alias"
+
+    echo "   go update <alias_name> <alias_path> --> updaters an old alias"
+
+    echo "   go remove_all     --> Delete file that contains alias paths."
+    echo "   go delete <alias_name> --> delete an alias"
+
+    echo "   go help --> Display this message"
+    echo "   go edit --> Open to edit $PORTFOLIO_DIRS"
+
+    echo "   go KEYWORD1     --> go to search in $GOROOT for a directory that is called KEYWORD1."
+    echo "   go KEYWORD1 KEYWORD2 --> go to search in $GOROOT using both keywords to find it."
+    echo "    "
+    echo "=========================================================="
+    echo "EXAMPLES"
+    echo "   > alias go 'source ~/bin/go_dir.csh'"
+    echo "   > go create home '$HOME' => Adds name 'home' to file '$PORTFOLIO_DIRS'."
+    echo "   > go list                => List all the created names. 'home' should show up."
+    echo "   > go home                => This will cd to '$HOME' ."
+    echo "   > go remove_all          => Deletes all names from file '$PORTFOLIO_DIRS'."
+    echo "    "
+    echo "=========================================================="
+    echo Created by: alvaro.
 }
 
 #==================================================
