@@ -1,4 +1,5 @@
 #!/bin/bash
+argv=("$@")
 
 function printFunctionName
 {
@@ -38,13 +39,11 @@ function usageHelp
 function checkInput 
 {
     printFunctionName
-    echo $@
-    echo ${BASH_ARGV[@]}
-    if [ $# -lt 1 ]
+    if [ ${#argv[@]} -lt 1 ]
     then
-    usageHelp
-    exitIfNotSourced;
-    exitSourcedScript;
+        usageHelp
+        exitIfNotSourced;
+        exitSourcedScript;
     fi
 }
 
