@@ -1,9 +1,10 @@
 #!/bin/bash
-argv=("$@")
+argv=($@)
 
 function printFunctionName
 {
-        printf "${FUNCNAME[1]}\n"
+        # printf "${FUNCNAME[1]}\n"
+        return
 }
 
 # store if we're sourced or not in a variable
@@ -73,8 +74,7 @@ function existsPortfolio
     printFunctionName
     if [ ! -f $PORTFOLIO_DIRS ]
     then 
-        mkdir -P "$(dirname $PORTFOLIO_DIRS)"
-        return
+        mkdir -p "$(dirname $PORTFOLIO_DIRS)"
         touch $PORTFOLIO_DIRS
     fi
 }
@@ -131,8 +131,13 @@ function getAliasList
 function getAliasInfo
 {
     printFunctionName
-    aliasName=$2
-    if [ ! -z $3 ]; then aliasPath=`realpath $3`; fi
+    aliasName=${argv[1]}
+    if [ ${#argv[@]} -eq 3 ]
+    then 
+        aliasPath=$(realpath ${argv[2]})
+        echo  ${argv[2]}
+        echo $aliasPath
+    fi
     if [ ! -d $aliasPath ]
     then 
         aliasPath=$(dirname $aliasPath)
@@ -156,18 +161,31 @@ function saveAlias
 {
     printFunctionName
     existsAlias
-    if [$aliasExists]
-    then 
-        updateAlias
+    if [ "$aliasExists" == "true" ]
+    then
+        echo "The current alias $aliasName exists."
+        echo -e "If you want to update use: \n \t go update <aliasName> <newDir>" 
+        exitSourcedScript;
     else
-        echo "${aliasName}:::${aliasPath}" >> ${PORTFOLIO_DIRS}
+        echo creating alias  "$aliasName:::${aliasPath}"
+        echo -e "$aliasName:::${aliasPath}" >> ${PORTFOLIO_DIRS}
     fi
 }
 
 function updateAlias
 {
     printFunctionName
-    sed -i "/${aliasName}/c\${aliasName}\:\:\:${aliasPath}" ${PORTFOLIO_DIRS}
+    existsAlias
+    if [ "$aliasExists" == "true" ]
+    then
+        sed -i "/${aliasName}/c\ " ${PORTFOLIO_DIRS}
+        sed -i "/^${aliasName}/d"  ${PORTFOLIO_DIRS}
+        sed -i "/^ /d"  ${PORTFOLIO_DIRS}
+
+        echo -e "$aliasName:::${aliasPath}" >> ${PORTFOLIO_DIRS}
+    else
+        echo "Alias not found"
+    fi
 }
 
 
@@ -179,7 +197,7 @@ function deleteAlias
     then 
          sed -i "/${aliasName}/c\ " ${PORTFOLIO_DIRS}
     fi
-    exitSourcedScript;
+    return
 }
 #==================================================
 
@@ -195,8 +213,9 @@ function removeAll
 function chooseMode
 {
     printFunctionName
-    if [ $# > 3 ]; then exitSourcedScript; fi
-    optionMode=$1
+    if [ ${#argv[@]} -gt 3 ]; then return; fi
+    optionMode=${argv[0]}
+    echo $optionMode
     case $optionMode in
         list)
         displayList
@@ -208,7 +227,7 @@ function chooseMode
         saveAlias
         ;;
         update)
-        saveAlias
+        updateAlias
         ;;
         delete)
         deleteAlias
@@ -232,8 +251,8 @@ function chooseMode
 function goDirectory
 {
     printFunctionName
-    aliasName=$1
-    Substring=$2
+    aliasName=${argv[0]}
+    Substring=${argv[1]}
 
     existsAlias
     if [ $aliasExists ]
@@ -257,7 +276,7 @@ function getAliasPath
     for aliasDBLine in `cat $PORTFOLIO_DIRS`
     do
         aliasDBName=`echo ${aliasDBLine} | cut -d ":" -f1`
-        if [ $aliasDBName =~ $aliasName ]
+        if [[ "$aliasDBName" =~ ($aliasName) ]]
         then
             aliasPath=`echo $aliasDBLine | cut -d ":" -f4-`
             aliasPath=`eval echo $aliasPath`
@@ -267,7 +286,6 @@ function getAliasPath
 }
 
 setSourcedScript
-printf "Source script = $SOURCED\n"
 setHelp
 checkInput
 setPortfolioName
