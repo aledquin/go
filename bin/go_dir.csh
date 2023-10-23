@@ -3,27 +3,34 @@
 
 set DOUSAGE = "Usage: go {help|list|create|delete|save|update|edit|remove_all} ?alias? ?path? ?regex?"
 
+DEFAULT:
+    if !($?PORTFOLIO_DIRS) then
+        set PORTFOLIO_DIRS = ${HOME}/env/dir_map.${USER}
+        goto DEFAULT
+    else if !( -f $PORTFOLIO_DIRS ) then
+        set PORTIR_PATH = `dirname $PORTFOLIO_DIRS`
+        if !( -d $PORTIR_PATH ) mkdir $PORTIR_PATH
+        touch $PORTFOLIO_DIRS
+        goto EXIT_THE_SCRIPT
+    else if !( $?GOROOT ) then
+        set GOROOT = $HOME
+        echo "No GOROOT variable found. Setting as $HOME."
+        goto DEFAULT
+    endif
+
+
 REQUIREMENTS:
     # echo REQUIREMENTS
     if ( $#argv < 1 ) then
         echo "$DOUSAGE"    
         goto EXIT_THE_SCRIPT
-    else if !($?PORTFOLIO_DIRS) then
-        goto DEFAULT
-    else if !( -f $PORTFOLIO_DIRS ) then
-        if !( -d ${HOME}/env ) mkdir ${HOME}/env
-        touch $PORTFOLIO_DIRS
-        goto REQUIREMENTS
-    else if !( $?GOROOT ) then
-        set GOROOT = $HOME
-        echo "No GOROOT variable found. Setting as $HOME."
     endif
 
 
 SETUP:
     # echo SETUP
     set ALIAS_LIST = `cat $PORTFOLIO_DIRS | cut -d ':' -f1 | sed 's/\n/ /g' `
-    set optionList = "-list -save -update -delete -remove_all -edit -help"
+    set optionList = "list save update delete remove_all edit help"
     switch ($argv[1])
         case list:
             goto DISPLAY_LIST
@@ -41,6 +48,8 @@ SETUP:
             goto HELP
         case edit:
             goto EDITING
+        case start:
+            goto EXIT_THE_SCRIPT
         default:
             goto GO_TO
         endsw
@@ -92,12 +101,6 @@ HELP:
     
     goto EXIT_THE_SCRIPT
 
-
-
-DEFAULT:
-    # echo DEFAULT
-    set PORTFOLIO_DIRS = ${HOME}/env/dir_map.${USER}
-    goto REQUIREMENTS
 
 EDITING:
     if !($?EDITOR) set EDITOR = "vi"
