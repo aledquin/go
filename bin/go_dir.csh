@@ -22,8 +22,8 @@ REQUIREMENTS:
 
 SETUP:
     # echo SETUP
-    set ALIAS_LIST = `cat $PORTFOLIO_DIRS | cut -d ":" -f1`
-
+    set ALIAS_LIST = `cat $PORTFOLIO_DIRS | cut -d ':' -f1 | sed 's/\n/ /g' `
+    set optionList = "%list %save %update %delete %remove_all %edit %help"
     switch ($argv[1])
         case 'list':
             goto DISPLAY_LIST
@@ -182,5 +182,8 @@ CLEAN:
     rm -f ${PORTFOLIO_DIRS}
 
 EXIT_THE_SCRIPT:
-    complete go 'p/1/`cat $PORTFOLIO_DIRS|cut -d ":" -f1`/' 
+    set ALIAS_LIST = `cat $PORTFOLIO_DIRS | cut -d ':' -f1 | sed 's/\n/ /g' `
+    set optionList = "%list %save %update %delete %remove_all %edit %help"
+ 
+    complete go 'p/1/"$ALIAS_LIST $optionList"/' 
     unset DOUSAGE

@@ -73,6 +73,45 @@ function usageHelp
     echo Created by: alvaro.
 }
 
+
+function chooseMode
+{
+    printFunctionName
+    if [ ${#argv[@]} -gt 3 ]; then return; fi
+    optionMode=${argv[0]}
+    optionList="%list %save %update %delete %remove_all %edit %help"
+    case $optionMode in
+        list)
+        displayList
+        ;;
+        save)
+        saveAlias
+        ;;
+        create)
+        saveAlias
+        ;;
+        update)
+        updateAlias
+        ;;
+        delete)
+        deleteAlias
+        ;;
+        remove_all)
+        removeAll
+        ;;
+        help)
+        usageHelp
+        ;;
+        edit)
+        runEditor
+        ;;
+        *)
+        goDirectory
+        ;;
+    esac
+    return;
+}
+
 #==================================================
 
 function checkInput 
@@ -249,43 +288,6 @@ function removeAll
 
 #==================================================
 
-function chooseMode
-{
-    printFunctionName
-    if [ ${#argv[@]} -gt 3 ]; then return; fi
-    optionMode=${argv[0]}
-    # echo $optionMode
-    case $optionMode in
-        list)
-        displayList
-        ;;
-        save)
-        saveAlias
-        ;;
-        create)
-        saveAlias
-        ;;
-        update)
-        updateAlias
-        ;;
-        delete)
-        deleteAlias
-        ;;
-        remove_all)
-        removeAll
-        ;;
-        help)
-        usageHelp
-        ;;
-        edit)
-        runEditor
-        ;;
-        *)
-        goDirectory
-        ;;
-    esac
-    return;
-}
 
 function goDirectory
 {
@@ -331,5 +333,5 @@ checkInput
 setPortfolioName
 chooseMode
 getAliasList
-complete -W "$aliasList" go
+complete -W "$aliasList $optionList" go
 exitSourcedScript;
