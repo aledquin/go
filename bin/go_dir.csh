@@ -88,6 +88,7 @@ HELP:
     echo "    "
     echo "=========================================================="
     echo Created by: alvaro.
+    echo 'Mirror: git clone https://github.com/aledquin/go.git'
     
     goto EXIT_THE_SCRIPT
 
