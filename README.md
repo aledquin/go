@@ -42,26 +42,26 @@ Usage: go {help|list|create|delete|save|update|edit|remove_all} ?alias? ?path? ?
    > go remove_all          => Deletes all names from file '/u/alvaro/env/dir_map.alvaro'.
 ```
 ==========================================================
-## OTHER FEATURES
-1) `go <TAB>` will display the aliases saved in `go`
+## FEATURES
+1) `go <TAB>` will display the aliases saved in `go` **AND NOW OPTIONS TOO!**
 2) When you save a the current directory, use:
    ```
       go save <alias_name> .
    ```
    It will automatically save the evaluated real path.
-3) If you want to use paths with env variables. You have to do it using `go edit`
-4) Directories are getting saved in: `${HOME}/env/dir_map.${USER}`
+4) If you want to use paths with env variables. You have to do it using `go edit`
+5) Directories are getting saved in: `${HOME}/env/dir_map.${USER}`
    If you want to redefine it, use a env var: 
    ```
     setenv PORTFOLIO_DIRS <new_path>
    ```
-5) `GOROOT` is the same.
+6) `GOROOT` is the same.
    ```
     setenv GOROOT <new_path>
    ```
-6) `go edit` will open to edit thru your defined `$EDITOR`
+7) `go edit` will open to edit thru your defined `$EDITOR`
 
-7) Create fast aliases using go:
+8) Create fast aliases using go:
      ```
         go save 1 <path>
         go 1
