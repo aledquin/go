@@ -23,23 +23,23 @@ REQUIREMENTS:
 SETUP:
     # echo SETUP
     set ALIAS_LIST = `cat $PORTFOLIO_DIRS | cut -d ':' -f1 | sed 's/\n/ /g' `
-    set optionList = "%list %save %update %delete %remove_all %edit %help"
+    set optionList = "-list -save -update -delete -remove_all -edit -help"
     switch ($argv[1])
-        case 'list':
+        case *list:
             goto DISPLAY_LIST
-        case 'save':
+        case *save:
             goto SAVE_IN_DB
-        case 'create':
+        case *create:
             goto SAVE_IN_DB
-        case 'update':
+        case *update:
             goto UPDATE
-        case 'delete':
+        case *delete:
             goto DELETE
-        case 'remove_all':
+        case *remove_all:
             goto CLEAN
-        case 'help':
+        case *help:
             goto HELP
-        case 'edit':
+        case *edit:
             goto EDITING
         default:
             goto GO_TO

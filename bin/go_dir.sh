@@ -79,30 +79,30 @@ function chooseMode
     printFunctionName
     if [ ${#argv[@]} -gt 3 ]; then return; fi
     optionMode=${argv[0]}
-    optionList="%list %save %update %delete %remove_all %edit %help"
+    optionList="-list -save -update -delete -remove_all -edit -help"
     case $optionMode in
-        list)
+        *list)
         displayList
         ;;
-        save)
+        *save)
         saveAlias
         ;;
-        create)
+        *create)
         saveAlias
         ;;
-        update)
+        *update)
         updateAlias
         ;;
-        delete)
+        *delete)
         deleteAlias
         ;;
-        remove_all)
+        *remove_all)
         removeAll
         ;;
-        help)
+        *help)
         usageHelp
         ;;
-        edit)
+        *edit)
         runEditor
         ;;
         *)
