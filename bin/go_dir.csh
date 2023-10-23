@@ -25,21 +25,21 @@ SETUP:
     set ALIAS_LIST = `cat $PORTFOLIO_DIRS | cut -d ':' -f1 | sed 's/\n/ /g' `
     set optionList = "-list -save -update -delete -remove_all -edit -help"
     switch ($argv[1])
-        case *list:
+        case list:
             goto DISPLAY_LIST
-        case *save:
+        case save:
             goto SAVE_IN_DB
-        case *create:
+        case create:
             goto SAVE_IN_DB
-        case *update:
+        case update:
             goto UPDATE
-        case *delete:
+        case delete:
             goto DELETE
-        case *remove_all:
+        case remove_all:
             goto CLEAN
-        case *help:
+        case help:
             goto HELP
-        case *edit:
+        case edit:
             goto EDITING
         default:
             goto GO_TO
@@ -157,7 +157,7 @@ GO_TO:
 
 GO_ALIAS: 
     foreach alias_DB (`cat $PORTFOLIO_DIRS`) 
-        if (`echo ${alias_DB} | cut -d ":" -f1` =~ $alias_name) then
+        if (`echo ${alias_DB} | cut -d ":" -f1` =~ "$alias_name") then
             set ALIAS_DIR = `echo $alias_DB | cut -d ":" -f4-`
             set ALIAS_DIR = `eval echo $ALIAS_DIR`
             cd $ALIAS_DIR
@@ -183,7 +183,7 @@ CLEAN:
 
 EXIT_THE_SCRIPT:
     set ALIAS_LIST = `cat $PORTFOLIO_DIRS | cut -d ':' -f1 | sed 's/\n/ /g' `
-    set optionList = "-list -save -update -delete -remove_all -edit -help"
+    set optionList = "list save update delete remove_all edit help"
     set completion = "$ALIAS_LIST $optionList" 
     
     complete go 'p/1/`eval echo ${completion}`/' 
