@@ -164,6 +164,7 @@ function getAliasList
 {
     printFunctionName
     aliasList=`cat $PORTFOLIO_DIRS | cut -d ":" -f1`
+    return
 }
 
 function getAliasInfo
@@ -311,10 +312,11 @@ function goDirectory
 function getAliasPath
 {
     printFunctionName
+    aliasName=${argv[0]}
     for aliasDBLine in `cat $PORTFOLIO_DIRS`
     do
         aliasDBName=`echo ${aliasDBLine} | cut -d ":" -f1`
-        if [[ "$aliasDBName" =~ ($aliasName) ]]
+        if [[ "$aliasDBName" =~ "$aliasName" ]]
         then
             aliasPath=`echo $aliasDBLine | cut -d ":" -f4-`
             aliasPath=`eval echo $aliasPath`
@@ -328,4 +330,6 @@ setHelp
 checkInput
 setPortfolioName
 chooseMode
+getAliasList
+complete -W "$aliasList" go
 exitSourcedScript;
