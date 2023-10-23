@@ -183,7 +183,8 @@ CLEAN:
 
 EXIT_THE_SCRIPT:
     set ALIAS_LIST = `cat $PORTFOLIO_DIRS | cut -d ':' -f1 | sed 's/\n/ /g' `
-    set optionList = "%list %save %update %delete %remove_all %edit %help"
- 
-    complete go 'p/1/"$ALIAS_LIST $optionList"/' 
+    set optionList = "-list -save -update -delete -remove_all -edit -help"
+    set completion = "$ALIAS_LIST $optionList" 
+    
+    complete go 'p/1/`eval echo ${completion}`/' 
     unset DOUSAGE
