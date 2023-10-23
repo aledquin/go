@@ -254,7 +254,7 @@ function chooseMode
     printFunctionName
     if [ ${#argv[@]} -gt 3 ]; then return; fi
     optionMode=${argv[0]}
-    echo $optionMode
+    # echo $optionMode
     case $optionMode in
         list)
         displayList
