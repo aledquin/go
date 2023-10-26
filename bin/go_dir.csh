@@ -9,7 +9,7 @@ DEFAULT:
         goto DEFAULT
     else if !( -f $PORTFOLIO_DIRS ) then
         set PORTIR_PATH = `dirname $PORTFOLIO_DIRS`
-        if !( -d $PORTIR_PATH ) mkdir $PORTIR_PATH
+        if !( -d $PORTIR_PATH ) mkdir -p $PORTIR_PATH
         touch $PORTFOLIO_DIRS
         goto EXIT_THE_SCRIPT
     else if !( $?GOROOT ) then
@@ -29,7 +29,7 @@ REQUIREMENTS:
 
 SETUP:
     # echo SETUP
-    set ALIAS_LIST = `cat $PORTFOLIO_DIRS | cut -d ':' -f1 | sed 's/\n/ /g' `
+    set ALIAS_LIST = `cat $PORTFOLIO_DIRS | cut -d ':' -f1 `
     set optionList = "list save update delete remove_all edit help"
     switch ($argv[1])
         case list:
@@ -166,18 +166,19 @@ GO_ALIAS:
             set ALIAS_DIR = `eval echo $ALIAS_DIR`
             cd $ALIAS_DIR
             if ($#argv > 1) then 
-                cd `find $ALIAS_DIR -type d | grep ".*$argv[2]" -m 1`
+                cd `find $ALIAS_DIR -type d | grep "$argv[2]" -m 1`
             endif
             goto EXIT_THE_SCRIPT
         endif
     end
 
+set finder = 'find $GOROOT -type d'
 
 GO_TO_GOROOT_DIR:
     if     ($#argv == 2)  then
-        cd `find $GOROOT -type d | grep "$argv[1].*$argv[2]" -m 1`
+        cd `find $GOROOT -type d | grep $argv[1] | grep $argv[2] | head -1`
     else if ($#argv == 1) then
-        cd `find $GOROOT -type d -name "*$argv[1]*" | head -1`
+        cd `find $GOROOT -type d | grep $argv[1] | head -1`
     endif
     goto EXIT_THE_SCRIPT
 
