@@ -1,5 +1,8 @@
-#!/bin/tcsh -fvx
+#!/bin/tcsh -fx
 # Created by: alvaro. 2023-10-17 \
+
+alias append 'set \!:1 = ($\!:1 \!:2-$)'
+alias breakpoint 'set fake_variable = $< ; unset fake_variable'
 
 set DOUSAGE = "Usage: go {help|list|create|delete|save|update|edit|remove_all} ?alias? ?path? ?regex?"
 
@@ -29,6 +32,7 @@ REQUIREMENTS:
 
 SETUP:
     # echo SETUP
+    set ALIAS_CONTENT = `cat $PORTFOLIO_DIRS`
     set ALIAS_LIST = `cat $PORTFOLIO_DIRS | cut -d ':' -f1 `
     set optionList = "list save update delete remove_all edit help"
     switch ($argv[1])
@@ -156,35 +160,41 @@ DELETE:
 
 GO_TO:
     set alias_name = "$argv[1]"
-    if ("$ALIAS_LIST" == "") goto GO_TO_GOROOT_DIR
 
 
-GO_ALIAS: 
+
+GET_ALIAS_PATH:
+    set GOFIND = $GOROOT
+    set KWGREP = ( $argv[*] )
     foreach alias_DB (`cat $PORTFOLIO_DIRS`) 
         if (`echo ${alias_DB} | cut -d ":" -f1` =~ "$alias_name") then
             set ALIAS_DIR = `echo $alias_DB | cut -d ":" -f4-`
-            set ALIAS_DIR = `eval echo $ALIAS_DIR`
-            cd $ALIAS_DIR
-            if ($#argv > 1) then 
-                cd `find $ALIAS_DIR -type d | grep "$argv[2]" -m 1`
-            endif
-            goto EXIT_THE_SCRIPT
+            set GOFIND = `eval echo $ALIAS_DIR`
+            set KWGREP = ( $argv[2-] )
+            break
         endif
     end
 
-set finder = 'find $GOROOT -type d'
 
-GO_TO_GOROOT_DIR:
-    if     ($#argv == 2)  then
-        cd `find $GOROOT -type d | grep $argv[1] | grep $argv[2] | head -1`
-    else if ($#argv == 1) then
-        cd `find $GOROOT -type d | grep $argv[1] | head -1`
-    endif
+CREATE_COMMAND:
+    set go_find_cmd = 'find $GOFIND -type d'
+    foreach keyword ($KWGREP)
+        append go_find_cmd '| grep "$keyword"'
+    end
+    append go_find_cmd '| head -1'
+    echo $go_find_cmd
+
+
+EXECUTE_CD:
+    set find_result = `eval $go_find_cmd`
+    cd $find_result
+    pwd
     goto EXIT_THE_SCRIPT
 
 
 CLEAN:
     rm -f ${PORTFOLIO_DIRS}
+
 
 EXIT_THE_SCRIPT:
     set ALIAS_LIST = `cat $PORTFOLIO_DIRS | cut -d ':' -f1 | sed 's/\n/ /g' `
@@ -193,3 +203,5 @@ EXIT_THE_SCRIPT:
     
     complete go 'p/1/`eval echo ${completion}`/' 
     unset DOUSAGE
+
+
