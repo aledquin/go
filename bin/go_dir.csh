@@ -59,6 +59,8 @@ SETUP:
             goto EXIT_THE_SCRIPT
         case exists:
             goto VERIFY_EXISTS
+        case alias:
+            goto DISPLAY_ALIAS_PATH
         default:
             goto GO_TO
         endsw
@@ -120,6 +122,11 @@ VERIFY_EXISTS:
 EDITING:
     if !($?EDITOR) set EDITOR = "vi"
     $EDITOR $PORTFOLIO_DIRS
+    goto EXIT_THE_SCRIPT
+
+DISPLAY_ALIAS_PATH:
+    set alias_name = $argv[2]
+    grep "$alias_name" ${PORTFOLIO_DIRS} | cut -d ":" -f4-
     goto EXIT_THE_SCRIPT
 
 
