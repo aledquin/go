@@ -8,7 +8,7 @@ alias aliasExists 'set ALIAS_EXISTS = `grep "$\!:1\*" ${PORTFOLIO_DIRS} | wc -l`
 
 
 set DOUSAGE = "Usage: go {help|list|create|delete|save|update|edit|remove_all} ?alias? ?path? ?regex?"
-set optionList = "list save update delete remove_all edit help"
+set optionList = "list save update delete remove_all edit alias exists help"
 
 DEFAULT:
     if !($?PORTFOLIO_DIRS) then
@@ -91,6 +91,10 @@ HELP:
 
     echo "   go remove_all     --> Delete file that contains alias paths."
     echo "   go delete <alias_name> --> delete an alias"
+
+    echo "   go alias <alias_name> --> get an alias path"
+    echo "   go exists <alias_name> --> return true or false if alias exists"
+
 
     echo "   go help --> Display this message"
     echo "   go edit --> Open to edit $PORTFOLIO_DIRS"
@@ -219,7 +223,6 @@ CLEAN:
 EXIT_THE_SCRIPT:
     sed -i "/^ /d"  ${PORTFOLIO_DIRS}
     set ALIAS_LIST = `cat $PORTFOLIO_DIRS | cut -d ':' -f1 | sed 's/\n/ /g' `
-    set optionList = "list save update delete remove_all edit help"
     set completion = "$ALIAS_LIST $optionList" 
     
     complete go 'p/1/`eval echo ${completion}`/' 
