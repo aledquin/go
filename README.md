@@ -30,7 +30,7 @@ Usage: go {help|list|create|delete|save|update|edit|remove_all} ?alias? ?path? ?
    go help --> Display this message
    go edit --> Open to edit ${HOME}/env/dir_map.${USER}
    go KEYWORD1     --> go to search in GOROOT for a directory that is called KEYWORD1.
-   go KEYWORD1 KEYWORD2 --> go to search in GOROOT using both keywords to find it.
+   go KEYWORD1 KEYWORD2 ... --> go to search in GOROOT using both keywords to find it.
 ```    
 ==========================================================
 ## EXAMPLES
@@ -49,6 +49,7 @@ Usage: go {help|list|create|delete|save|update|edit|remove_all} ?alias? ?path? ?
       go save <alias_name> .
    ```
    It will automatically save the evaluated real path.
+3) It allows n-keywords to search now!
 4) If you want to use paths with env variables. You have to do it using `go edit`
 5) Directories are getting saved in: `${HOME}/env/dir_map.${USER}`
    If you want to redefine it, use a env var: 
