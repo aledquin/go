@@ -133,14 +133,14 @@ SAVE_IN_DB:
         echo "usage: go create alias_name directory"
     else
         set alias_name = $argv[2]
-        set alias_dir  = `readlink -f $argv[3]`
-        if !(-d $alias_dir) set alias_dir  = `dirname $alias_dir`
-        set alias_exis = `grep "$alias_name\*" ${PORTFOLIO_DIRS} | wc -l`
-        if ($alias_exis > 0) then
-            echo $alias_exis
+        set ALIAS_DIR  = `readlink -f $argv[3]`
+        if !(-d $ALIAS_DIR) set ALIAS_DIR  = `dirname $ALIAS_DIR`
+        set ALIAS_EXISTS = `grep "$alias_name\*" ${PORTFOLIO_DIRS} | wc -l`
+        if ($ALIAS_EXISTS > 0) then
+            echo $ALIAS_EXISTS
             goto UPDATE
         else 
-            echo "${alias_name}:::${alias_dir}" >> ${PORTFOLIO_DIRS}
+            echo "${alias_name}:::${ALIAS_DIR}" >> ${PORTFOLIO_DIRS}
         endif
     endif
     goto EXIT_THE_SCRIPT
@@ -151,24 +151,21 @@ UPDATE:
         echo "usage: go update alias_name directory"
     else
         set alias_name = $argv[2]
-        set alias_dir  = `readlink -f $argv[3]`
-        if !(-d $alias_dir) then 
-            set alias_dir  = `dirname $alias_dir`
-        endif
-        set alias_exis = `grep "$alias_name\*" ${PORTFOLIO_DIRS} | wc -l`
-        sed -i "/${alias_name}/c\${alias_name}\:\:\:${alias_dir}" ${PORTFOLIO_DIRS}
+        set ALIAS_DIR  = `readlink -f $argv[3]`
+        if !(-d $ALIAS_DIR) set ALIAS_DIR  = `dirname $ALIAS_DIR`
+        set ALIAS_EXISTS = `grep "$alias_name\*" ${PORTFOLIO_DIRS} | wc -l`
+        sed -i "/${alias_name}/c\${alias_name}\:\:\:${ALIAS_DIR}" ${PORTFOLIO_DIRS}
     endif
     goto EXIT_THE_SCRIPT
 
 
 DELETE:
+    set alias_name = "$argv[2]"
     if ($#argv != 2) then 
         echo "usage: go delete alias_name"
     else
-        set alias_name = "$argv[2]"
-        set alias_exis = `grep "$alias_name" ${PORTFOLIO_DIRS} | wc -l`
-        echo $alias_exis
-        if ($alias_exis) sed -i "/${alias_name}/c\ " ${PORTFOLIO_DIRS}
+        set ALIAS_EXISTS = `grep "$alias_name" ${PORTFOLIO_DIRS} | wc -l`
+        if ($ALIAS_EXISTS) sed -i "/${alias_name}/c\ " ${PORTFOLIO_DIRS}
     endif
     goto EXIT_THE_SCRIPT
 
