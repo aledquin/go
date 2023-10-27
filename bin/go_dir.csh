@@ -3,8 +3,12 @@
 
 alias append 'set \!:1 = ($\!:1 \!:2-$)'
 alias breakpoint 'set fake_variable = $< ; unset fake_variable'
+alias ifelse 'if ( \!:1 ) eval \!:2 ; if !( \!:1 ) eval \!:3'
+alias aliasExists 'set ALIAS_EXISTS = `grep "$\!:1\*" ${PORTFOLIO_DIRS} | wc -l`; ifelse "$ALIAS_EXISTS" "echo true" "echo false"'
+
 
 set DOUSAGE = "Usage: go {help|list|create|delete|save|update|edit|remove_all} ?alias? ?path? ?regex?"
+set optionList = "list save update delete remove_all edit help"
 
 DEFAULT:
     if !($?PORTFOLIO_DIRS) then
@@ -34,7 +38,6 @@ SETUP:
     # echo SETUP
     set ALIAS_CONTENT = `cat $PORTFOLIO_DIRS`
     set ALIAS_LIST = `cat $PORTFOLIO_DIRS | cut -d ':' -f1 `
-    set optionList = "list save update delete remove_all edit help"
     switch ($argv[1])
         case list:
             goto DISPLAY_LIST
@@ -54,6 +57,8 @@ SETUP:
             goto EDITING
         case start:
             goto EXIT_THE_SCRIPT
+        case exists:
+            goto VERIFY_EXISTS
         default:
             goto GO_TO
         endsw
@@ -103,6 +108,12 @@ HELP:
     echo Created by: alvaro.
     echo 'Mirror: git clone https://github.com/aledquin/go.git'
     
+    goto EXIT_THE_SCRIPT
+
+
+VERIFY_EXISTS:
+    set alias_name = $argv[2]
+    aliasExists $alias_name
     goto EXIT_THE_SCRIPT
 
 
