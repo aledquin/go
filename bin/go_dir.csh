@@ -3,8 +3,12 @@
 
 alias append 'set \!:1 = ($\!:1 \!:2-$)'
 alias breakpoint 'set fake_variable = $< ; unset fake_variable'
+alias ifelse 'if ( \!:1 ) eval \!:2 ; if !( \!:1 ) eval \!:3'
+alias aliasExists 'set ALIAS_EXISTS = `grep "$\!:1\*" ${PORTFOLIO_DIRS} | wc -l`; ifelse "$ALIAS_EXISTS" "echo true" "echo false"'
+
 
 set DOUSAGE = "Usage: go {help|list|create|delete|save|update|edit|remove_all} ?alias? ?path? ?regex?"
+set optionList = "list save update delete remove_all edit help"
 
 DEFAULT:
     if !($?PORTFOLIO_DIRS) then
@@ -34,7 +38,6 @@ SETUP:
     # echo SETUP
     set ALIAS_CONTENT = `cat $PORTFOLIO_DIRS`
     set ALIAS_LIST = `cat $PORTFOLIO_DIRS | cut -d ':' -f1 `
-    set optionList = "list save update delete remove_all edit help"
     switch ($argv[1])
         case list:
             goto DISPLAY_LIST
@@ -54,6 +57,10 @@ SETUP:
             goto EDITING
         case start:
             goto EXIT_THE_SCRIPT
+        case exists:
+            goto VERIFY_EXISTS
+        case alias:
+            goto DISPLAY_ALIAS_PATH
         default:
             goto GO_TO
         endsw
@@ -106,9 +113,20 @@ HELP:
     goto EXIT_THE_SCRIPT
 
 
+VERIFY_EXISTS:
+    set alias_name = $argv[2]
+    aliasExists $alias_name
+    goto EXIT_THE_SCRIPT
+
+
 EDITING:
     if !($?EDITOR) set EDITOR = "vi"
     $EDITOR $PORTFOLIO_DIRS
+    goto EXIT_THE_SCRIPT
+
+DISPLAY_ALIAS_PATH:
+    set alias_name = $argv[2]
+    grep "$alias_name" ${PORTFOLIO_DIRS} | cut -d ":" -f4-
     goto EXIT_THE_SCRIPT
 
 
@@ -122,14 +140,14 @@ SAVE_IN_DB:
         echo "usage: go create alias_name directory"
     else
         set alias_name = $argv[2]
-        set alias_dir  = `readlink -f $argv[3]`
-        if !(-d $alias_dir) set alias_dir  = `dirname $alias_dir`
-        set alias_exis = `grep "$alias_name\*" ${PORTFOLIO_DIRS} | wc -l`
-        if ($alias_exis > 0) then
-            echo $alias_exis
+        set ALIAS_DIR  = `readlink -f $argv[3]`
+        if !(-d $ALIAS_DIR) set ALIAS_DIR  = `dirname $ALIAS_DIR`
+        set ALIAS_EXISTS = `grep "$alias_name\*" ${PORTFOLIO_DIRS} | wc -l`
+        if ($ALIAS_EXISTS > 0) then
+            echo $ALIAS_EXISTS
             goto UPDATE
         else 
-            echo "${alias_name}:::${alias_dir}" >> ${PORTFOLIO_DIRS}
+            echo "${alias_name}:::${ALIAS_DIR}" >> ${PORTFOLIO_DIRS}
         endif
     endif
     goto EXIT_THE_SCRIPT
@@ -140,24 +158,21 @@ UPDATE:
         echo "usage: go update alias_name directory"
     else
         set alias_name = $argv[2]
-        set alias_dir  = `readlink -f $argv[3]`
-        if !(-d $alias_dir) then 
-            set alias_dir  = `dirname $alias_dir`
-        endif
-        set alias_exis = `grep "$alias_name\*" ${PORTFOLIO_DIRS} | wc -l`
-        sed -i "/${alias_name}/c\${alias_name}\:\:\:${alias_dir}" ${PORTFOLIO_DIRS}
+        set ALIAS_DIR  = `readlink -f $argv[3]`
+        if !(-d $ALIAS_DIR) set ALIAS_DIR  = `dirname $ALIAS_DIR`
+        set ALIAS_EXISTS = `grep "$alias_name\*" ${PORTFOLIO_DIRS} | wc -l`
+        sed -i "/${alias_name}/c\${alias_name}\:\:\:${ALIAS_DIR}" ${PORTFOLIO_DIRS}
     endif
     goto EXIT_THE_SCRIPT
 
 
 DELETE:
+    set alias_name = "$argv[2]"
     if ($#argv != 2) then 
         echo "usage: go delete alias_name"
     else
-        set alias_name = "$argv[2]"
-        set alias_exis = `grep "$alias_name" ${PORTFOLIO_DIRS} | wc -l`
-        echo $alias_exis
-        if ($alias_exis) sed -i "/${alias_name}/c\ " ${PORTFOLIO_DIRS}
+        set ALIAS_EXISTS = `grep "$alias_name" ${PORTFOLIO_DIRS} | wc -l`
+        if ($ALIAS_EXISTS) sed -i "/${alias_name}/c\ " ${PORTFOLIO_DIRS}
     endif
     goto EXIT_THE_SCRIPT
 
