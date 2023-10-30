@@ -3,8 +3,6 @@
 
 alias append 'set \!:1 = ($\!:1 \!:2-$)'
 alias breakpoint 'set fake_variable = $< ; unset fake_variable'
-alias ifelse 'if ( \!:1 ) eval \!:2 ; if !( \!:1 ) eval \!:3'
-alias aliasExists 'set ALIAS_EXISTS = `grep "$\!:1\*" ${PORTFOLIO_DIRS} | wc -l`; ifelse "$ALIAS_EXISTS" "echo true" "echo false"'
 
 
 set DOUSAGE = "Usage: go {help|list|create|delete|save|update|edit|remove_all} ?alias? ?path? ?regex?"
@@ -119,7 +117,13 @@ HELP:
 
 VERIFY_EXISTS:
     set alias_name = $argv[2]
-    aliasExists $alias_name
+    set ALIAS_EXISTS = `grep $alias_name ${PORTFOLIO_DIRS} | wc -l`
+    if ($ALIAS_EXISTS > 0) then 
+        echo true 
+    else
+        echo false
+    endif
+    unset ALIAS_EXISTS
     goto EXIT_THE_SCRIPT
 
 
