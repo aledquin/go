@@ -1,6 +1,6 @@
 #!/bin/tcsh -fx
 # Created by: alvaro. 2023-10-17 \
-
+set GOCD_VERSION "1.1.0"
 alias append 'set \!:1 = ($\!:1 \!:2-$)'
 alias breakpoint 'set fake_variable = $< ; unset fake_variable'
 
@@ -59,6 +59,8 @@ SETUP:
             goto VERIFY_EXISTS
         case alias:
             goto DISPLAY_ALIAS_PATH
+        case version:
+            goto GET_GO_VERSION
         default:
             goto GO_TO
         endsw
@@ -223,6 +225,8 @@ EXECUTE_CD:
 CLEAN:
     rm -f ${PORTFOLIO_DIRS}
 
+GET_GO_VERSION:
+    echo $GOCD_VERSION
 
 EXIT_THE_SCRIPT:
     sed -i "/^ /d"  ${PORTFOLIO_DIRS}
