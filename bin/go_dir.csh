@@ -5,7 +5,7 @@ alias append 'set \!:1 = ($\!:1 \!:2-$)'
 alias breakpoint 'set fake_variable = $< ; unset fake_variable'
 
 
-set DOUSAGE = "Usage: go {help|list|create|delete|save|update|edit|remove_all} ?alias? ?path? ?regex?"
+set DOUSAGE = 'Usage: go {help|list|create|delete|save|update|alias|exists|edit|remove_all} ?alias? ?KEYWORD1[ KEYWORD2]...?'
 set optionList = "list save update delete remove_all edit alias exists help"
 
 DEFAULT:
@@ -171,7 +171,7 @@ UPDATE:
         set ALIAS_DIR  = `readlink -f $argv[3]`
         if !(-d $ALIAS_DIR) set ALIAS_DIR  = `dirname $ALIAS_DIR`
         set ALIAS_EXISTS = `grep "$alias_name\*" ${PORTFOLIO_DIRS} | wc -l`
-        sed -i "/${alias_name}/c\${alias_name}\:\:\:${ALIAS_DIR}" ${PORTFOLIO_DIRS}
+        if ($ALIAS_EXISTS) sed -i "/${alias_name}/c\${alias_name}\:\:\:${ALIAS_DIR}" ${PORTFOLIO_DIRS}
     endif
     goto EXIT_THE_SCRIPT
 
