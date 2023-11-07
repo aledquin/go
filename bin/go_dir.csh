@@ -1,6 +1,6 @@
 #!/bin/tcsh -fx
 # Created by: alvaro. 2023-10-17 \
-set GOCD_VERSION "1.1.0"
+set GOCD_VERSION = "1.1.0"
 alias append 'set \!:1 = ($\!:1 \!:2-$)'
 alias breakpoint 'set fake_variable = $< ; unset fake_variable'
 

@@ -13,7 +13,7 @@ endif
 
 if !(-f ${HOME}/.cshrc) touch ${HOME}/.cshrc
 if !(`grep "alias go" ${HOME}/.cshrc | wc -l`) then
-    echo alias go source ${HOME}/bin/go_dir.csh >> ${HOME}/.cshrc
+    echo alias go source ${HOME}/bin/go_dir.csh >> ${HOME}/.cshrc.${USER}
 endif
 
 exit
