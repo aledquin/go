@@ -11,7 +11,7 @@ dprint SOURCED=$SOURCED
 
 function _test {
     counter=${counter:=0}
-    counter=$((counter+1
+    counter=$((counter+1))
     _fargs=($@)
     functionName=$1
     ret_val=$3
