@@ -1,10 +1,20 @@
 #!/bin/bash
 argv=($@)
 
+function dprint {
+    _MESSAGE_="$@"
+    DEBUG=${DEBUG:=0}
+        if [ $DEBUG -ne "0" ]; then
+             printf "${_MESSAGE_}\n"
+        fi
+        unset _MESSAGE_
+        return
+}
+
+
 function printFunctionName
 {
-        # printf "${FUNCNAME[1]}\n"
-        return
+    dprint "${FUNCNAME[1]}"
 }
 
 # store if we're sourced or not in a variable
@@ -23,6 +33,7 @@ function exitIfNotSourced {
 function setHelp {
     printFunctionName
     DOUSAGE='Usage: go {help|list|create|delete|save|update|alias|exists|edit|remove_all} ?alias? ?KEYWORD1[ KEYWORD2]...?'
+    return
 }
 
 function usageHelp {
@@ -67,21 +78,20 @@ function usageHelp {
     echo "    "
     echo "=========================================================="
     echo Created by: alvaro.
+    return 0
 }
 
-function chooseMode {
+function runOptionMode {
     printFunctionName
-    if [ ${#argv[@]} -gt 3 ]; then return; fi
-    optionMode=${argv[0]}
-    optionList="-list -save -update -delete -remove_all -edit -help"
+    optionMode=${1:=$optionMode}
     case $optionMode in
+    *alias)
+        displayAliasPath
+        ;;
     *list)
-        displayList
+        displayAliasList
         ;;
-    *save)
-        saveAlias
-        ;;
-    *create)
+    *save | *create)
         saveAlias
         ;;
     *update)
@@ -91,7 +101,7 @@ function chooseMode {
         deleteAlias
         ;;
     *exists)
-        existsAlias
+        setAliasExists  
         ;;
     *remove_all)
         removeAll
@@ -103,6 +113,7 @@ function chooseMode {
         runEditor
         ;;
     *)
+        aliasName=${argv[0]}
         goDirectory
         ;;
     esac
@@ -111,7 +122,7 @@ function chooseMode {
 
 #==================================================
 
-function checkInput {
+function verifyMinArgumentsRequired {
     printFunctionName
     if [ ${#argv[@]} -lt 1 ]; then
         usageHelp
@@ -134,10 +145,10 @@ function setPortfolioName {
     DEFAULT_PORTFOLIO_NAME="$HOME/env/dir_map.$USER"
     PORTFOLIO_DIRS=
     : ${PORTFOLIO_DIRS:=$DEFAULT_PORTFOLIO_NAME}
-    existsPortfolio
+    createPortfolio
 }
 
-function existsPortfolio {
+function createPortfolio {
     printFunctionName
     if [ ! -f $PORTFOLIO_DIRS ]; then
         mkdir -p "$(dirname $PORTFOLIO_DIRS)"
@@ -174,7 +185,7 @@ function runEditor {
 
 #==================================================
 
-function displayList {
+function displayAliasList {
     printFunctionName
     cat ${PORTFOLIO_DIRS} | sed 's/:::/\t--> /g'
     exitSourcedScript
@@ -182,108 +193,29 @@ function displayList {
 
 #==================================================
 
-function getAliasList {
+function setAliasList {
     printFunctionName
     aliasList=$(cat $PORTFOLIO_DIRS | cut -d ":" -f1)
     return
 }
 
-function getAliasInfo {
+
+function setAliasName {
     printFunctionName
-    aliasName=${argv[1]}
-    if [ ${#argv[@]} -eq 3 ]; then
-        aliasPath=$(realpath ${argv[2]})
-        echo ${argv[2]}
-        echo $aliasPath
-    fi
+    aliasName=${1:=$argv[1]}
+}
+
+function setAliasPath {
+    printFunctionName
+    aliasPath=$(eval realpath $1)
     if [ ! -d $aliasPath ]; then
         aliasPath=$(dirname $aliasPath)
-    fi
-
-}
-
-function existsAlias {
-    printFunctionName
-    getAliasInfo
-    isInFile=$(cat $PORTFOLIO_DIRS | grep -c "$aliasName")
-    if [ $isInFile -eq 0 ]; then
-        aliasExists=false
-    else
-        aliasExists=true
-    fi
-    if [ $optionMode == "exists" ]; then
-        echo $aliasExists
-    fi
-
-}
-
-function saveAlias {
-    printFunctionName
-    existsAlias
-    if [ "$aliasExists" == "true" ]; then
-        echo "The current alias $aliasName exists."
-        echo -e "If you want to update use: \n \t go update <aliasName> <newDir>"
-        exitSourcedScript
-    else
-        echo creating alias "$aliasName:::${aliasPath}"
-        echo -e "$aliasName:::${aliasPath}" >>${PORTFOLIO_DIRS}
-    fi
-}
-
-function updateAlias {
-    printFunctionName
-    existsAlias
-    if [ "$aliasExists" == "true" ]; then
-        sed -i "/${aliasName}/c\ " ${PORTFOLIO_DIRS}
-        sed -i "/^${aliasName}/d" ${PORTFOLIO_DIRS}
-        sed -i "/^ /d" ${PORTFOLIO_DIRS}
-
-        echo -e "$aliasName:::${aliasPath}" >>${PORTFOLIO_DIRS}
-    else
-        echo "Alias not found"
-    fi
-}
-
-function deleteAlias {
-    printFunctionName
-    existsAlias
-    if [$aliasExists]; then
-        sed -i "/${aliasName}/c\ " ${PORTFOLIO_DIRS}
-    fi
-    return
-}
-#==================================================
-
-function removeAll {
-    printFunctionName
-    rm -f ${PORTFOLIO_DIRS}
-    exitSourcedScript
-}
-
-#==================================================
-
-function goDirectory {
-    printFunctionName
-    aliasName=${argv[0]}
-    Substring=${argv[1]}
-
-    existsAlias
-    if [ $aliasExists ]; then
-        getAliasPath
-        cd $(find $aliasPath -type d | grep ".*$SubString" -m 1)
-    else
-
-        if [ $# ] >1; then
-            cd $(find $GOROOT -type d | grep "${aliasName}.*${SubString}" -m 1)
-        else
-            cd $(find $GOROOT -type d -name "*${aliasName}" | head -1)
-        fi
-    fi
+    fi  
 }
 
 function getAliasPath {
     printFunctionName
-    aliasName=${argv[0]}
+    aliasName=$1
     for aliasDBLine in $(cat $PORTFOLIO_DIRS); do
         aliasDBName=$(echo ${aliasDBLine} | cut -d ":" -f1)
         if [[ "$aliasDBName" =~ "$aliasName" ]]; then
@@ -293,16 +225,181 @@ function getAliasPath {
         fi
     done
 }
+function displayAliasPath {
+    printFunctionName
+    aliasName=${argv[1]}
+    setAliasExists $aliasName
+    if [ $aliasExists ]; then
+        getAliasPath $aliasName
+        echo $aliasPath
+    fi  
+}
+function setAliasExists {
+    printFunctionName
+    aliasName=$1
+    isInFile=$(cat $PORTFOLIO_DIRS | grep -c "$aliasName")
+    if [ $isInFile -eq 0 ]; then
+        aliasExists=false
+    else
+        aliasExists=true
+    fi
+}
 
-function main {
-    setSourcedScript
-    setHelp
-    checkInput
-    setPortfolioName
-    chooseMode
-    getAliasList
-    complete -W "$aliasList $optionList" go
+function getAliasExists {
+    printFunctionName
+    setAliasName
+    setAliasExists $aliasName
+    echo $aliasExists
+}
+
+
+
+function saveAlias {
+    printFunctionName
+    if [${#argv[@]} -ne 3]; then 
+        echo "usage: go save <aliasName> <aliasPath>"
+        return
+    fi
+    setAliasName    $argv[1]
+    setAliasExists  $aliasName
+    if [$aliasExists]; then
+        echo "The current alias $aliasName exists."
+        echo -e "If you want to update use: \n \t go update <aliasName> <newDir>"
+        exitSourcedScript
+    else
+        setAliasPath $argv[2]
+        echo Creating alias "$aliasName:::${aliasPath}"
+        echo -e "$aliasName:::${aliasPath}" >> ${PORTFOLIO_DIRS}
+    fi
+}
+
+function updateAlias {
+    printFunctionName
+    if [${#argv[@]} -ne 3]; then 
+        echo "usage: go update <aliasName> <aliasPath>"
+        return
+    fi   
+    setAliasName    $argv[1]
+    setAliasExists  $aliasName
+    
+    if [$aliasExists]; then
+        deleteAlias 
+        saveAlias
+    else
+        echo "Alias not found"
+    fi
+}
+
+function deleteAlias {
+    printFunctionName
+    if [${#argv[@]} -ne 2]; then 
+        echo "usage: go delete <aliasName>"
+        return
+    fi  
+    setAliasName    $argv[1]
+    setAliasExists  $aliasName
+    if [$aliasExists]; then
+        sed -i "/${aliasName}/c\ " ${PORTFOLIO_DIRS}
+        sed -i "/^${aliasName}/d" ${PORTFOLIO_DIRS}
+    fi
+    return
+}
+#==================================================
+
+function removeAll {
+    printFunctionName
+    rm -f ${PORTFOLIO_DIRS}
+    touch ${PORTFOLIO_DIRS}
     exitSourcedScript
 }
 
-main
+#==================================================
+function setGoFindRoot {
+    printFunctionName
+    setAliasExists  $aliasName
+    if [ $aliasExists ]; then
+        getAliasPath $aliasName
+        goFindRoot=$aliasPath
+        KWGREP=${argv[1-]}
+    else
+        goFindRoot=$GOROOT
+        KWGREP=${argv[@]}
+    fi
+}
+
+function create_find_grep_cmd {
+    printFunctionName
+    goFindCmd="find $goFindRoot -type d"
+    for keyword in $KWGREP; do
+        goFindCmd+=' | grep '
+        goFindCmd+=\"$keyword\"
+    done
+    goFindCmd+=' | head -1'
+}
+
+function goDirectory {
+    printFunctionName
+    goPath=$(eval $goFindCmd)
+    cd $goPath >& /dev/null || cd $goFindRoot
+    pwd
+}
+
+
+function addComplete {
+    printFunctionName
+    complete -W "$aliasList $optionList" go
+    sed -i "/^ /d" ${PORTFOLIO_DIRS}
+
+}
+
+function setOptionList {
+    optionList="-list -save -create -exists -update -delete -remove_all -edit -help"
+}
+
+function setOptionExists {
+    optionName=$1
+    optionExists=false
+    if ["$optionList" =~ "$optionName"]; then
+        optionExists=true
+    fi
+    return $optionExists
+}
+
+function _begin {
+    setSourcedScript
+    setHelp
+    setPortfolioName
+    setGOROOT
+    setAliasList
+    setOptionList
+    verifyMinArgumentsRequired
+}
+
+function _main {
+    setOptionExists ${argv[0]}
+    if [$optionExists]; then
+        runOptionMode $optionName
+        return
+    else
+        setAliasName ${argv[0]}
+        setAliasExists $aliasName
+        setGoFindRoot
+        create_find_grep_cmd
+        goDirectory
+        return
+    fi
+
+
+}
+
+function _end {
+    addComplete
+    exitSourcedScript    
+}
+
+function go {
+    argv=($@)
+    _begin
+    _main
+    _end 
+}
