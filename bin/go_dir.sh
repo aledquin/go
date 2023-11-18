@@ -4,11 +4,10 @@ argv=($@)
 function dprint {
     _MESSAGE_="$@"
     DEBUG=${DEBUG:=0}
-        if [ $DEBUG -ne "0" ]; then
-             printf "${_MESSAGE_}\n"
-        fi
-        unset _MESSAGE_
-        return
+    if [ $DEBUG -ne "0" ]; then
+        echo "${_MESSAGE_}"
+    fi
+    unset _MESSAGE_
 }
 
 
@@ -32,7 +31,7 @@ function exitIfNotSourced {
 
 function setHelp {
     printFunctionName
-    DOUSAGE='Usage: go {help|list|create|delete|save|update|alias|exists|edit|remove_all} ?alias? ?KEYWORD1[ KEYWORD2]...?'
+    DOUSAGE='Usage:sd {help|list|create|delete|save|update|alias|exists|edit|remove_all} ?alias? ?KEYWORD1[ KEYWORD2]...?'
     return
 }
 
@@ -40,37 +39,37 @@ function usageHelp {
     printFunctionName
     setHelp
     echo "You will need to setup an alias that sources this script. As:"
-    echo "   > alias go 'source ~/bin/go_dir.sh'"
+    echo "   > aliassd 'source ~/binsd_dir.sh'"
     echo "=========================================================="
     echo "$DOUSAGE"
     echo "=========================================================="
     echo "DESCRIPTION "
-    echo "   'go' is a tool that saves paths you want to go again. It has the option to save paths with their own aliases. When you save a new alias, it gets added to complete option: 'go <TAB>' and it will show the options.\n   It will look directly to you GOROOT path if you use a keyword that is not an alias or an option. It uses the first two strings as argument for regex searching for directories. "
+    echo "   sd' is a tool that saves paths you want tosd again. It has the option to save paths with their own aliases. When you save a new alias, it gets added to complete option: sd <TAB>' and it will show the options.\n   It will look directly to yousdROOT path if you use a keyword that is not an alias or an option. It uses the first two strings as argument for regex searching for directories. "
     echo "Directories are getting saved in: $PORTFOLIO_DIRS"
     echo "If you want to redefine it, use a env var\n: > setenv PORTFOLIO_DIRS <new_path>"
     echo "    "
     echo "=========================================================="
     echo "COMMANDS"
-
-    echo "   go list --> Display list of alias directories saved"
-
-    echo "   go create <alias_name> <alias_path> --> save a new alias"
-    echo "   go save   <alias_name> <alias_path> --> save a new alias"
-
-    echo "   go update <alias_name> <alias_path> --> updaters an old alias"
-
-    echo "   go remove_all     --> Delete file that contains alias paths."
-    echo "   go delete <alias_name> --> delete an alias"
-
-    echo "   go help --> Display this message"
-    echo "   go edit --> Open to edit $PORTFOLIO_DIRS"
-
-    echo "   go KEYWORD1     --> go to search in $GOROOT for a directory that is called KEYWORD1."
-    echo "   go KEYWORD1 KEYWORD2 --> go to search in $GOROOT using both keywords to find it."
+    
+    echo "  sd list --> Display list of alias directories saved"
+    
+    echo "  sd create <alias_name> <alias_path> --> save a new alias"
+    echo "  sd save   <alias_name> <alias_path> --> save a new alias"
+    
+    echo "  sd update <alias_name> <alias_path> --> updaters an old alias"
+    
+    echo "  sd remove_all     --> Delete file that contains alias paths."
+    echo "  sd delete <alias_name> --> delete an alias"
+    
+    echo "  sd help --> Display this message"
+    echo "  sd edit --> Open to edit $PORTFOLIO_DIRS"
+    
+    echo "  sd KEYWORD1     -->sd to search in sdROOT for a directory that is called KEYWORD1."
+    echo "  sd KEYWORD1 KEYWORD2 -->sd to search in sdROOT using both keywords to find it."
     echo "    "
     echo "=========================================================="
     echo "EXAMPLES"
-    echo "   > alias go 'source ~/bin/go_dir.csh'"
+    echo "   > aliassd 'source ~/bin/go_dir.csh'"
     echo "   > go create home '$HOME' => Adds name 'home' to file '$PORTFOLIO_DIRS'."
     echo "   > go list                => List all the created names. 'home' should show up."
     echo "   > go home                => This will cd to '$HOME' ."
@@ -85,36 +84,36 @@ function runOptionMode {
     printFunctionName
     optionMode=${1:=$optionMode}
     case $optionMode in
-    *alias)
-        displayAliasPath
+        *alias)
+            displayAliasPath
         ;;
-    *list)
-        displayAliasList
+        *list)
+            displayAliasList
         ;;
-    *save | *create)
-        saveAlias
+        *save | *create)
+            saveAlias
         ;;
-    *update)
-        updateAlias
+        *update)
+            updateAlias
         ;;
-    *delete)
-        deleteAlias
+        *delete)
+            deleteAlias
         ;;
-    *exists)
-        setAliasExists  
+        *exists)
+            setAliasExists
         ;;
-    *remove_all)
-        removeAll
+        *remove_all)
+            removeAll
         ;;
-    *help)
-        usageHelp
+        *help)
+            usageHelp
         ;;
-    *edit)
-        runEditor
+        *edit)
+            runEditor
         ;;
-    *)
-        aliasName=${argv[0]}
-        goDirectory
+        *)
+            aliasName=${argv[0]}
+            goDirectory
         ;;
     esac
     return
@@ -195,7 +194,7 @@ function displayAliasList {
 
 function setAliasList {
     printFunctionName
-    aliasList=$(cat $PORTFOLIO_DIRS | cut -d ":" -f1)
+    aliasList="$(cat $PORTFOLIO_DIRS | cut -d ":" -f1)"
     return
 }
 
@@ -210,7 +209,7 @@ function setAliasPath {
     aliasPath=$(eval realpath $1)
     if [ ! -d $aliasPath ]; then
         aliasPath=$(dirname $aliasPath)
-    fi  
+    fi
 }
 
 function getAliasPath {
@@ -232,7 +231,7 @@ function displayAliasPath {
     if [ $aliasExists ]; then
         getAliasPath $aliasName
         echo $aliasPath
-    fi  
+    fi
 }
 function setAliasExists {
     printFunctionName
@@ -256,13 +255,13 @@ function getAliasExists {
 
 function saveAlias {
     printFunctionName
-    if [${#argv[@]} -ne 3]; then 
+    if [ ${#argv[@]} -ne 3 ]; then
         echo "usage: go save <aliasName> <aliasPath>"
         return
     fi
     setAliasName    $argv[1]
     setAliasExists  $aliasName
-    if [$aliasExists]; then
+    if [ $aliasExists ]; then
         echo "The current alias $aliasName exists."
         echo -e "If you want to update use: \n \t go update <aliasName> <newDir>"
         exitSourcedScript
@@ -275,15 +274,15 @@ function saveAlias {
 
 function updateAlias {
     printFunctionName
-    if [${#argv[@]} -ne 3]; then 
+    if [ ${#argv[@]} -ne 3 ]; then
         echo "usage: go update <aliasName> <aliasPath>"
         return
-    fi   
+    fi
     setAliasName    $argv[1]
     setAliasExists  $aliasName
     
-    if [$aliasExists]; then
-        deleteAlias 
+    if [ $aliasExists ]; then
+        deleteAlias
         saveAlias
     else
         echo "Alias not found"
@@ -292,13 +291,13 @@ function updateAlias {
 
 function deleteAlias {
     printFunctionName
-    if [${#argv[@]} -ne 2]; then 
+    if [ ${#argv[@]} -ne 2 ]; then
         echo "usage: go delete <aliasName>"
         return
-    fi  
+    fi
     setAliasName    $argv[1]
     setAliasExists  $aliasName
-    if [$aliasExists]; then
+    if [ $aliasExists ]; then
         sed -i "/${aliasName}/c\ " ${PORTFOLIO_DIRS}
         sed -i "/^${aliasName}/d" ${PORTFOLIO_DIRS}
     fi
@@ -349,18 +348,22 @@ function addComplete {
     printFunctionName
     complete -W "$aliasList $optionList" go
     sed -i "/^ /d" ${PORTFOLIO_DIRS}
-
+    
 }
 
 function setOptionList {
-    optionList="-list -save -create -exists -update -delete -remove_all -edit -help"
+    printFunctionName
+    optionList="(-list -save -create -exists -update -delete -remove_all -edit -help)"
 }
 
 function setOptionExists {
+    printFunctionName
     optionName=$1
-    optionExists=false
-    if ["$optionList" =~ "$optionName"]; then
-        optionExists=true
+    optionExists=0
+    dprint $optionList
+    dprint $optionName
+    if [[ "$optionList" =~ "$optionName" ]]; then
+        optionExists=1
     fi
     return $optionExists
 }
@@ -388,18 +391,18 @@ function _main {
         goDirectory
         return
     fi
-
-
+    
+    
 }
 
 function _end {
     addComplete
-    exitSourcedScript    
+    exitSourcedScript
 }
 
-function go {
+function sd {
     argv=($@)
     _begin
     _main
-    _end 
+    _end
 }
