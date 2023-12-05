@@ -22,7 +22,8 @@ function printFunctionName
     dprint "${FUNCNAME[@]:1:DEBUG}"
 }
 
-function set_debug {
+function set_debug 
+{
     local _fargs=($@)
     (is_integer "${_fargs[0]}") && DEBUG=${_fargs[0]}
 }
