@@ -4,6 +4,8 @@ root=$(realpath $(dirname $0)/../)
 RealBin="$root/bin"
 RealScript="go_dir.sh"
 
+source $root/sharedlib/lib.bash
+
 source $RealBin/$RealScript
 
 function counter {
