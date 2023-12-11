@@ -15,7 +15,7 @@ function Package.pkgIndexcall {
 }
 
 function Package.import {
-    Package._import $@ || ( eprint $1 was not imported || echo Messaging package not found ) && return 1
+    Package._import $@ || ( echo "Error: $1 was not imported" ) && return 1
 }
 
 function Package._import {

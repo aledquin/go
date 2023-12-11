@@ -15,9 +15,9 @@ function Setup.is_integer
     local _fargs=($@)
     if ! [[ "$_fargs" =~ ^-?[0-9.]+$ ]]
         then
-            dprint "$_fargs is not an integer"
+            echo "$_fargs is not an integer"
             return 1
     fi
-    dprint "$_fargs is integer"
+    echo "$_fargs is integer"
     return 0
 }
