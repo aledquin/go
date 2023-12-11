@@ -1,28 +1,24 @@
 
 function Messaging.eprint {
-    echo -ne "\e[0;31mError:\e[0m "
-    echo $@
-    return 1
+    local _MESSAGE_="$@"
+    _MESSAGE_="\e[0;31mError:\e[0m $_MESSAGE_"
+    echo -e "$_MESSAGE_"
 }
 
 function Messaging.dprint {
     local _MESSAGE_="$@"
     DEBUG=${DEBUG:=0}
-    if [ $DEBUG -ne "0" ]; then
-        echo "${_MESSAGE_}"
-    fi
+    [[ $DEBUG -ne "0" ]] && echo "${_MESSAGE_}"
 }
 
 function Messaging.vprint {
     local _MESSAGE_="$@"
     VERBOSITY=${VERBOSITY:=0}
-    if [ $VERBOSITY -ne "0" ]; then
-        echo "${_MESSAGE_}"
-    fi
+    [[ $VERBOSITY -ne "0" ]] && echo "${_MESSAGE_}"
 }
 
 function Messaging.printFunctionName
 {
-    set_debug $@
+    Setup.set_debug $@
     dprint "${FUNCNAME[@]:1:DEBUG}"
 }

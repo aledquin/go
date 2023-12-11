@@ -6,7 +6,7 @@ VERBOSITY=${VERBOSITY:=0} && [[ $VERBOSITY -gt 0 ]]  && set -o verbose
 function Setup.set_debug 
 {
     local _fargs=($@)
-    (is_integer "${_fargs[0]}") && DEBUG=${_fargs[0]}
+    (Setup.is_integer "${_fargs[0]}") && DEBUG=${_fargs[0]}
 }
 
 function Setup.is_integer 

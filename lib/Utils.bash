@@ -8,9 +8,7 @@ function Utils.exitIfNotSourced {
     [[ "$SOURCED" != "0" ]] || exit
 }
 
-
-
-function da.incr {
+function Utils.incr {
     printFunctionName
     local _fargs=($@)
     local num_var=${_fargs[0]}
@@ -25,3 +23,6 @@ function da.incr {
     return 0
 }
 
+function Utils.defined {
+  [ -v $@ ] && return 0 || return 1
+}
