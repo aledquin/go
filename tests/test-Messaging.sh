@@ -1,22 +1,34 @@
 #!/bin/bash
 argv=($@)
-root=$(realpath $(dirname $0)/../)
-RealBin="$root/bin"
-RealScript="go_dir.sh"
 
-source $root/lib/pkgIndex.bash
+function _setup {
+    root=$(realpath $(dirname $0)/../)
+    export root
 
+    BinBin="$root/bin"
+    local LibBin="$root/lib"
+    RealScript="Messaging.bash"
 
+    source $LibBin/Package.bash
+}
+
+function _requirements {
+    Package.import Setup
+    Package.import Messaging
+    Package.import Utils
+
+    Package.get_function eprint dprint vprint
+}
 
 function counter {
     counter=${counter:=0}
-    counter=$((counter+1))
+    counter=$((counter + 1))
 }
 
 function _test {
     printFunctionName
     counter
-    
+
     functionName=$1
     ret_val=$3
 
@@ -25,7 +37,7 @@ function _test {
 
     $functionName $functionArgs
     varReturn="${!2}"
-    
+
     dprint "$functionName $functionArgs"
     dprint "variable:$2"
     dprint "ret_val: $varReturn"
@@ -37,4 +49,6 @@ function _test {
     fi
 }
 
+_setup
+_requirements
 eprint is it red
