@@ -37,29 +37,29 @@ function get_ansi_color {
     color_reset='\e[0;0m'
     local color_name=($1)
     case $color_name in
-    red)
-        color_ansi='\e[0;31m'
+        red)
+            color_ansi='\e[0;31m'
         ;;
-    green)
-        color_ansi='\e[0;32m'
+        green)
+            color_ansi='\e[0;32m'
         ;;
-    yellow)
-        color_ansi='\e[0;33m'
+        yellow)
+            color_ansi='\e[0;33m'
         ;;
-    blue)
-        color_ansi='\e[0;34m'
+        blue)
+            color_ansi='\e[0;34m'
         ;;
-    magenta)
-        color_ansi='\e[0;35m'
+        magenta)
+            color_ansi='\e[0;35m'
         ;;
-    cyan)
-        color_ansi='\e[0;36m'
+        cyan)
+            color_ansi='\e[0;36m'
         ;;
-    white)
-        color_ansi='\e[0;37m'
+        white)
+            color_ansi='\e[0;37m'
         ;;
-    *)
-        color_ansi='\e[0;0m'
+        *)
+            color_ansi='\e[0;0m'
         ;;
     esac
     return
@@ -71,21 +71,21 @@ function Messaging.print {
     local _fargs=($@)
     local severity=$_fargs
     local _Message=${_fargs[@]:1}
-
+    
     local color_reset
     local color_ansi
-
-    [[ "$severity" =~ "err" ]] && get_ansi_color red && _prefix='-E-'
-    [[ "$severity" =~ "warn" ]] && get_ansi_color yellow && _prefix='-W-'
-    [[ "$severity" =~ "info" ]] && get_ansi_color white && _prefix='-I-'
+    
+    [[ "$severity" =~ "err" ]] && get_ansi_color red     && _prefix='-E-'
+    [[ "$severity" =~ "war" ]] && get_ansi_color yellow  && _prefix='-W-'
+    [[ "$severity" =~ "inf" ]] && get_ansi_color white   && _prefix='-I-'
     [[ "$severity" =~ "deb" ]] && get_ansi_color magenta && _prefix='-D-'
-    [[ "$severity" =~ "sys" ]] && get_ansi_color cyan && _prefix='-S-'
-
+    [[ "$severity" =~ "sys" ]] && get_ansi_color cyan    && _prefix='-S-'
+    
     _Message="$_prefix $_Message"
     echo -e "$color_ansi $_Message $color_reset"
     Messaging.logger "$_Message"
     return
-
+    
 }
 
 function Messaging.logger {
@@ -105,11 +105,11 @@ function write_file {
 }
 
 # function Messaging.header {
-#     local 
+#     local
 # }
 
 # function Messaging.footer {
-#     local 
+#     local
 # }
 
 # function Messaging.verifyparameters {
