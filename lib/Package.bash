@@ -9,22 +9,22 @@ function Package.__init__ {
     source $dir/generic.bash
     source $dir/debug.bash
     __run=true
-
+    
 }
 
 function Package.exit {
     Package.printFunctionName
-     [[ $DEBUG -gt 0 ]] && return 1 ||  exit 1
+    [[ $DEBUG -gt 0 ]] && return 1 ||  exit 1
 }
 
 function Package.printFunctionName {
-    echo -e "${FUNCNAME[@]:1:1} ${_fargs[@]}"
+    echo -e "${FUNCNAME[@]:1:3} ${_fargs[@]}"
 }
 
 function Package.pkgIndexcall {
     local _fargs=($@)
     Package.printFunctionName
-
+    
     dir=$(dirname $(realpath ${BASH_SOURCE[0]}))
     local root=$(realpath $dir/../)
     local RealBin="${root}/bin"
@@ -34,7 +34,7 @@ function Package.require {
     local _fargs=($@)
     Package.printFunctionName
     Package.import -force ${_fargs[0]} && return 0 || (echo "Package ${_fargs[0]} was not found. Please use package import") && Package.exit
-
+    
 }
 
 function Package.import {
@@ -59,7 +59,7 @@ function Package._import {
 function Package.copy_function {
     local _fargs=($@)
     Package.printFunctionName
-
+    
     test -n "$(declare -f "$1")" || return 1
     eval "${_/$1/$2}" && return 0
 }
@@ -75,11 +75,13 @@ function Package.get_function {
 }
 
 function Package.provide {
-   local _fargs=($@)
-   Package.printFunctionName
+    local _fargs=($@)
+    Package.printFunctionName
+    echo aqui
     local pkg_name=$1
     [[ -v BASH_PKGS ]] || BASH_PKGS=()
     (lsearch $pkg_name $BASH_PKGS) && return 0 || ([[ $DEBUG -gt 0 ]] && echo "$pkg_name is getting added")
+
     BASH_PKGS=($BASH_PKGS $pkg_name) || echo "Error! $pkg_name"
 }
 

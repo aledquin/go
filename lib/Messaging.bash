@@ -20,8 +20,7 @@ function Messaging.vprint {
 
 function Messaging.printFunctionName {
     local _fargs=($@)
-    debug.set ${_fargs[0]}
-    echo "${FUNCNAME[@]:1:DEBUG}"
+    echo "${FUNCNAME[@]:1:3}"
 }
 
 # creates two new variables to colorize the message

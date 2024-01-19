@@ -15,6 +15,7 @@ function _setup {
 function _requirements {
     Package.import Messaging
     Package.import Utils
+    Package.get_function vprint dprint eprint
 }
 
 function counter {
@@ -33,7 +34,7 @@ function _test {
     functionArgs=${_fargs[3]}
 
     $functionName $functionArgs
-    varReturn="${!2}"
+    varReturn="$2"
 
     debug.print "$functionName $functionArgs"
     debug.print "variable:$2"
@@ -48,4 +49,5 @@ function _test {
 
 _setup
 _requirements
-_test eprint "is it red" "is it red" 
+msg="is it red"
+_test eprint "-E- $msg" $msg

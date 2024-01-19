@@ -46,7 +46,7 @@ function incr {
     local num_var=${_fargs[0]}
     local num_val=${!num_var:=0}
     local add_val=${_fargs[1]:=1}
-
+    echo aka en incr
     (is_integer $num_val) && (is_integer $add_val) || return 1
 
     num_val=$((num_val + add_val))
