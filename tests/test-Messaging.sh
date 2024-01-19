@@ -13,11 +13,8 @@ function _setup {
 }
 
 function _requirements {
-    Package.import Setup
     Package.import Messaging
     Package.import Utils
-
-    Package.get_function eprint dprint vprint
 }
 
 function counter {
@@ -26,21 +23,21 @@ function counter {
 }
 
 function _test {
-    printFunctionName
+    local _fargs=($@)
+    Messaging.printFunctionName
     counter
 
     functionName=$1
     ret_val=$3
 
-    _fargs=($@)
     functionArgs=${_fargs[3]}
 
     $functionName $functionArgs
     varReturn="${!2}"
 
-    dprint "$functionName $functionArgs"
-    dprint "variable:$2"
-    dprint "ret_val: $varReturn"
+    debug.print "$functionName $functionArgs"
+    debug.print "variable:$2"
+    debug.print "ret_val: $varReturn"
 
     if [[ "$varReturn" =~ "$ret_val" ]]; then
         echo ">$counter> PASSED:$functionName"
@@ -51,4 +48,4 @@ function _test {
 
 _setup
 _requirements
-eprint is it red
+_test eprint "is it red" "is it red" 

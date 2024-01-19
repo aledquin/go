@@ -82,7 +82,7 @@ function usageHelp {
 
 function runOptionMode {
     printFunctionName
-    optionMode=${1:=$optionMode}
+    optionMode=${1:=optionMode}
     setAliasName ${argv[1]}
     case $optionMode in
         *alias)
